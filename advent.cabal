@@ -14,7 +14,7 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
   exposed-modules:     Day1, Day2, Day3, Day4, Day5
-                     , Day6, Day7
+                     , Day6, Day7, Day8
   build-depends:       base >= 4.7 && < 5,
                        containers
 executable day1p1
@@ -98,6 +98,12 @@ executable day7p1
 executable day7p2
   hs-source-dirs:      exe
   main-is:             Day7P2.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5,
+                       advent
+executable day8p1
+  hs-source-dirs:      exe
+  main-is:             Day8P1.hs
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5,
                        advent
