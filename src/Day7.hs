@@ -17,7 +17,6 @@ parseConstraint = do
   string " must be finished before step "
   c2 <- (satisfy (\x -> x >= 'A' && x <= 'Z'))
   return (c1, c2)
-
 lineToConstraint :: String -> (Char, Char)
 lineToConstraint s = (fst . head) $ readP_to_S parseConstraint s
 
@@ -57,22 +56,52 @@ stepSequence (StepGraph map)
         subGraph = (StepGraph $ Map.delete firstAvailable map)
 
 -- Part 2
-type Schedule = Map Char Int
+data Worker = Worker { task :: Char, time :: Int }
+  deriving Show
+
+type Schedule = Map Int Worker
 
 cost :: Map Char Int
-cost = Map.fromList $ zip ['A'..'Z'] [1..]
+cost = Map.fromList $ zip ['A'..'Z'] [61..]
 getCost = flip (Map.findWithDefault 0) cost
 
 removeConstraint :: Char -> StepGraph -> StepGraph
 removeConstraint char (StepGraph m) = StepGraph (Map.delete char m)
 
-idleWorkers :: Schedule -> [Char]
-idleWorkers sched = Map.keys (Map.filter (== 0) sched)
+buildSched :: Int -> Schedule
+buildSched x = Map.fromList $ [(i, (Worker '_' 0)) | i <- [0..(x-1)]]
 
-scheduleTask :: Schedule -> Char -> Schedule
-scheduleTask sched task = assignTask (idleWorkers sched)
+idleWorkers :: Schedule -> [Int]
+idleWorkers sched = Map.keys (Map.filter ((== 0) . time) sched)
+
+allIdle :: Schedule -> Bool
+allIdle x = (== length x) . (length . idleWorkers) $ x
+
+scheduleTask :: Char -> Schedule -> Schedule
+scheduleTask task sched = assignTask (idleWorkers sched)
   where assignTask [] = sched
-        assignTask (x:_) = Map.insert task (getCost task) sched
+        assignTask (x:_) = Map.insert x (Worker task (getCost task)) sched
 
-tickSchedule :: Schedule -> Schedule
-tickSchedule sched = Map.map ((min 0) . ((-) 1)) $ sched
+takenTasks :: Schedule -> [Char]
+takenTasks m = Map.foldr (:) [] takenTasks
+  where takenTasks = fmap task (Map.withoutKeys m (Set.fromList (idleWorkers m)))
+
+completedTasks :: Schedule -> [Char]
+completedTasks m = Map.foldr (:) [] completedTasks
+  where completedTasks = fmap task (Map.restrictKeys m (Set.fromList (idleWorkers m)))
+
+tickWorker :: Worker -> Worker
+tickWorker (Worker { task = tsk, time = t }) = Worker tsk (max (t - 1) 0)
+
+tick :: Schedule -> Schedule
+tick = Map.map tickWorker
+
+graphMap (StepGraph m) = m
+
+totalTime :: Schedule -> StepGraph -> Int
+totalTime sched graph@(StepGraph gmap)
+  | allIdle sched && (length availableTasks == 0) = 0
+  | otherwise = 1 + (totalTime updatedSchedule newGraph)
+  where newGraph = foldr removeConstraint graph (completedTasks sched)
+        availableTasks = sort . filter (not . ((flip elem) (takenTasks sched))) . filter (available newGraph) $ (Map.keys (graphMap newGraph))
+        updatedSchedule = (tick . foldr scheduleTask sched) (reverse availableTasks)
