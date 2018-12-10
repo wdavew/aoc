@@ -11,7 +11,7 @@ treeFromList node subTrees = (RTree node subTrees)
 number :: ReadP Int
 number = do
   x <- many1 $ satisfy (\x -> (x >= '0' && x <= '9'))
-  optional $ char ' '
+  char ' '
   return (read x)
 
 tree :: ReadP RTree
