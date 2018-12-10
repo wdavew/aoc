@@ -1,5 +1,6 @@
 module Day8 where
 import Text.ParserCombinators.ReadP
+import Data.List
 
 type Node = [Int]
 data RTree = RTree Node [RTree]
@@ -31,3 +32,16 @@ foldTree f x (RTree node rest) = f node (map (foldTree f x) rest)
 
 sumLicenses :: RTree -> Int
 sumLicenses = foldTree (\a b -> sum a + sum b) 0
+
+-- Part 2
+getDefaultIdx y (-1) xs =  y
+getDefaultIdx y k xs = case drop k xs of
+  x:_ -> x
+  [] -> y
+
+getNodeChildren :: [Int] -> RTree -> [RTree]
+getNodeChildren idxs (RTree node children) = map (\idx -> getDefaultIdx (RTree [] []) (idx - 1) children) idxs
+
+treeValue :: RTree -> Int
+treeValue (RTree metadata []) = sum metadata
+treeValue t@(RTree metadata children) = sum $ map treeValue (getNodeChildren metadata t)
