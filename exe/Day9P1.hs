@@ -2,4 +2,4 @@ import Day9
 
 main :: IO ()
 main = do
-  putStrLn $ show (highestScore 411 72059)
+  putStrLn $ show (scores 411 (72059*100) initialRound)
