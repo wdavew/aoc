@@ -1,4 +1,4 @@
 import Day11
 
 main :: IO ()
-main = print (largestTotalPower 7400 300 3)
+main = print (largestTotalPower 300 3 7400)
