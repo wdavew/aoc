@@ -18,7 +18,8 @@ library
                      , Day11, Day12, Day13, Day14
   build-depends:       base >= 4.7 && < 5,
                        containers,
-                       bytestring
+                       bytestring,
+                       split
 executable day1p1
   hs-source-dirs:      exe
   main-is:             Day1P1.hs
