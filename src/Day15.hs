@@ -167,6 +167,8 @@ resolveUnit u gs = uncurry resolveAttacks . resolveMoves u $ gs
 testGrid = S.fromList $ [ (i, j) | i <- [1..100]::[Int], j <- [1..100]::[Int] ]
 emptyState = GameState S.empty S.empty S.empty [] [] 0
 
-
+resolveRound :: GameState -> GameState
+resolveRound gs@(GameState { _next = [] }) = gs
+resolveRound gs@(GameState { _next = x:xs }) = resolveRound (resolveUnit x gs)
 
 txt = readFile "./input/day15.txt"
