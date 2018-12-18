@@ -19,7 +19,8 @@ library
   build-depends:       base >= 4.7 && < 5,
                        containers,
                        bytestring,
-                       split
+                       split,
+                       unique
 executable day1p1
   hs-source-dirs:      exe
   main-is:             Day1P1.hs
@@ -162,4 +163,5 @@ executable day15
   main-is:             Day15P1.hs
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5,
-                       advent
+                       advent,
+                       containers
